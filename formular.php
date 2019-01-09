@@ -1,18 +1,14 @@
 <?php
-$servername = "localhost";
-$username = "my_wine_catalog__user";
-$password = "my_wine_catalog__user";
-$dbname = "my_wine_catalog";
+
+  require_once ('sql_connector.php');
+  require_once ('my_wine_catalog.php');
 
 
-// Create connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-// Check connection
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
 
+  // Objekt erzeugen. Datenbank verbindung wird hergestellt.
+  $sql_connector = new sql_connector ('localhost', 'my_wine_catalog__user', 'my_wine_catalog__user', 'my_wine_catalog');
 
+/*
 // sql to create table
 $sql = "CREATE TABLE MyWineCatalog (
 id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -28,17 +24,34 @@ price_perbottle DOUBLE(10, 2) NOT NULL,
 price_total DOUBLE(20, 3) NOT NULL,
 currency VARCHAR(1) NOT NULL,
 )";
-
+*/
 
 /*
 $sql = "INSERT INTO MyWineCatalog (weingut, winzer, region, jahrgang, volume, quantity, self_score, critic_score, price_perbottle, price_total, currency )
 VALUES ('Big Bitch', 'Bitch', 'Bitch Country', '1000', '1.5', '3', '2.3', '4', '100.44', '301.32', '€')";
 */
 
-if(!empty($_POST['To_The_Catalog_And_Beyond'])) // check if button is clicked
+//Fehlermeldungen für die leeren Felder
+
+$error = false;
+
+$weingut_error_empty = '';
+$winzer_error_empty = '';
+$region_error_empty = '';
+$jahrgang_error_empty = '';
+$volume_error_empty = '';
+$quantity_error_empty = '';
+$self_score_error_empty = '';
+$critic_score_error_empty = '';
+$price_perbottle_error_empty = '';
+$price_total_error_empty = '';
+$currency_error_empty = '';
+
+// Überprüft ob der Button geklicked wurde
+if(!empty($_POST['To_The_Catalog_And_Beyond']))
 {
 
-    //get the values from the POST REQUEST
+    //Die Werte werden vom POST request genommen
     $weingut = $_POST['weingut'];
     $winzer = $_POST['winzer'];
     $region = $_POST['region'];
@@ -51,23 +64,10 @@ if(!empty($_POST['To_The_Catalog_And_Beyond'])) // check if button is clicked
     $price_total = $_POST['price_total'];
     $currency = $_POST['currency'];
 
-    //errors for empty fields
-    $weingut_error_empty = '';
-    $winzer_error_empty = '';
-    $region_error_empty = '';
-    $jahrgang_error_empty = '';
-    $volume_error_empty = '';
-    $quantity_error_empty = '';
-    $self_score_error_empty = '';
-    $critic_score_error_empty = '';
-    $price_perbottle_error_empty = '';
-    $price_total_error_empty = '';
-    $currency_error_empty = '';
-
-    //errors for wrong inputs
 
 
-  //if submitted, then validate for empty fields and/or wrong input
+
+  //Fehlermeldungen werden überpruft, ob leer, ob falscher text...
 	if(empty($weingut))
 	{
 		$error=true;
@@ -142,12 +142,18 @@ if(!empty($_POST['To_The_Catalog_And_Beyond'])) // check if button is clicked
       $error=true;
       $currency_error_empty='Currency is empty. Please enter your currency.';
       }
+  //Falls alles stimmt, werden die Werte übergeben und in die Datenbank eingetragen
+
+ if ($error==false) {
+  $my_wine_catalog = new my_wine_catalog ($weingut, $winzer, $region, $jahrgang, $volume, $quantity, $self_score, $critic_score, $price_perbottle, $price_total, $currency);
+    $sql_connector->insert($my_wine_catalog);
+
+  }
 
 }
 
 
-
-$conn->close();
+$sql_connector->connection -> close();
 ?>
 
 
@@ -158,46 +164,59 @@ $conn->close();
     <link href="winestyle.css" rel="stylesheet" type="text/css">
 </head>
 <body>
+  <main id="box">
     <div id="wrap">
-        <form method="post" action="" id="winecatalogform" >
+        <form method="post" action="formular.php" id="winecatalogform" >
         <div>
           <label for="weingut">Weingut</label>
-          <input <?php echo $weingut_error_empty; ?> type="text" name="weingut" >
+          <input type="text" name="weingut" >
+          <?php echo $weingut_error_empty; ?>
           <br>
           <label for="winzer">Winzer</label>
-          <input <?php echo $winzer_error_empty; ?> type="text" name="winzer" >
+          <input type="text" name="winzer" >
+          <?php echo $winzer_error_empty; ?>
           <br>
           <label for="region">Region</label>
-          <input <?php echo $region_error_empty; ?> type="text" name="region" >
+          <input type="text" name="region" >
+          <?php echo $region_error_empty; ?>
           <br>
           <label for="jahrgang">Jahrgang</label>
-          <input <?php echo $jahrgang_error_empty; ?> type="number" name="jahrgang" >
+          <input  type="number" name="jahrgang">
+          <?php echo $jahrgang_error_empty; ?>
           <br>
           <label for="volume">Volume</label>
-          <input <?php echo $volume_error_empty; ?> type="number" name="volume" >
+          <input  type="number" step="0.1" name="volume" >
+          <?php echo $volume_error_empty; ?>
           <br>
           <label for="quantity">Quantity</label>
-          <input <?php echo $quantity_error_empty; ?> type="number" name="quantity" >
+          <input  type="number" name="quantity">
+          <?php echo $quantity_error_empty; ?>
           <br>
           <label for="self_score">Self_score</label>
-          <input <?php echo $self_score_error_empty; ?> type="number" name="self_score" >
+          <input  type="number" step="0.1" name="self_score">
+          <?php echo $self_score_error_empty; ?>
           <br>
           <label for="critic_score">Critic_score</label>
-          <input <?php echo $critic_score_error_empty; ?> type="number" name="critic_score" >
+          <input  type="number" step="0.1" name="critic_score">
+          <?php echo $critic_score_error_empty; ?>
           <br>
           <label for="price_perbottle">Price_perbottle</label>
-          <input <?php echo $price_perbottle_error_empty; ?> type="number" name="price_perbottle" >
+          <input  type="number" step="0.01" name="price_perbottle">
+          <?php echo $price_perbottle_error_empty; ?>
           <br>
           <label for="price_total">Price_total</label>
-          <input <?php echo $price_total_error_empty; ?> type="number" name="price_total" >
+          <input type="number" step="0.01" name="price_total">
+           <?php echo $price_total_error_empty; ?>
           <br>
           <label for="currency">Currency</label>
-          <input <?php echo $currency_error_empty; ?> type="text" name="currency" >
+          <input type="text" name="currency" >
+           <?php echo $currency_error_empty; ?>
           <br>
 
         </div>
-        <input type="submit" value="To_The_Catalog_And_Beyond" name="To_The_Catalog_And_Beyond"></button>
+        <input type="submit" value="To_The_Catalog_And_Beyond" name="To_The_Catalog_And_Beyond">
        </form>
 	</div>
+  </main>
 </body>
 </html>
