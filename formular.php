@@ -193,11 +193,11 @@ $sql_connector->connection -> close();
           <?php echo $quantity_error_empty; ?>
           <br>
           <label for="self_score">Self_score</label>
-          <input  type="number" step="0.1" name="self_score">
+          <input  type="text" name="self_score">
           <?php echo $self_score_error_empty; ?>
           <br>
           <label for="critic_score">Critic_score</label>
-          <input  type="number" step="0.1" name="critic_score">
+          <input  type="text" name="critic_score">
           <?php echo $critic_score_error_empty; ?>
           <br>
           <label for="price_perbottle">Price_perbottle</label>
@@ -215,8 +215,11 @@ $sql_connector->connection -> close();
 
         </div>
         <input type="submit" value="To_The_Catalog_And_Beyond" name="To_The_Catalog_And_Beyond">
+        <input type="button" onclick="history.go(-1)" value="Refresh">
        </form>
 	</div>
   </main>
+
+
 </body>
 </html>
